@@ -1,0 +1,20 @@
+/ {
+	aliases {
+		led-red = &red_led_external;
+		led-green = &green_led_external;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		
+		red_led_external: led_d11 {
+			gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>;
+			label = "External Red LED";
+		};
+
+		green_led_external: led_d12 {
+			gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>;
+			label = "External Green LED";
+		};
+	};
+};
