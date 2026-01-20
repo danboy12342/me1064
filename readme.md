@@ -6,9 +6,9 @@ This repository contains lab exercises for the **Digital Electronics & Embedded 
 
 The goal of this repo is to demonstrate how to configure GPIOs, use Device Tree Overlays, and generate precise timing signals.
 
-## 📂 Project Structure
+## Structure
 
-The project follows the standard Zephyr application structure. The most important files are:
+The project follows the standard Zephyr application structure.
 
 ```text
 /your-project-root
@@ -22,7 +22,7 @@ The project follows the standard Zephyr application structure. The most importan
 
 ---
 
-## 🛠 Hardware Setup
+## Hardware Setup
 
 *   **Microcontroller:** STM32 Nucleo-L432KC
 *   **Components:**
@@ -34,7 +34,7 @@ The project follows the standard Zephyr application structure. The most importan
 
 ---
 
-## 📝 Program 1: Alternating LEDs
+## Program 1: Alternating LEDs
 
 **Objective:** Flash an external Red LED (Pin D11) and Green LED (Pin D12) alternately every 1 second.
 
@@ -48,7 +48,7 @@ The project follows the standard Zephyr application structure. The most importan
 
 ---
 
-## 📝 Program 2: Square Wave Generator
+## Program 2: Square Wave Generator
 
 **Objective:** Generate two simultaneous square waves with vastly different frequencies to observe timing behavior on an oscilloscope.
 1.  **100 kHz Signal** on Pin **D10** (PA11).
@@ -71,7 +71,7 @@ To achieve **microsecond precision**, we cannot use standard sleep functions.
 
 ---
 
-## ⚠️ Common Troubleshooting
+## Common Troubleshooting
 
 ### 1. "DT_ALIAS not found" or Build Errors
 If you get errors saying `led_red` or specific nodes are undefined:
