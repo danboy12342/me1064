@@ -3,24 +3,10 @@
 ![Zephyr RTOS](https://img.shields.io/badge/Zephyr-RTOS-blue) ![Board](https://img.shields.io/badge/Board-Nucleo--L432KC-green) ![Course](https://img.shields.io/badge/Course-ENG1064-orange)
 
 This repository contains **incremental lab exercises** for the *Digital Electronics & Embedded Systems* course. Each example builds on the previous one and targets the **STM32 Nucleo‑L432KC** using **Zephyr RTOS**.
-
-The focus is on practical MCU I/O: GPIO, timing, digital inputs, direct register access, displays, and DAC output.
-
 ---
-
 ## Repository Structure
 
-Each exercise is self‑contained in its own folder and follows the standard Zephyr application layout.
-
-```text
-.
-├── ex1_blinky
-├── ex2_waves
-├── ex3_switch_waves
-├── ex4_segment_disp
-├── ex5_hello
-├── ex6_dac
-```
+Each exercise is self‑contained in its own folder and follows the standard Zephyr application layout as given by Dr Giorgos in lecture 2 or 3?.
 
 Inside each exercise:
 
@@ -33,11 +19,7 @@ exX_name/
 ├── prj.conf                    # Zephyr configuration
 └── CMakeLists.txt              # Build system
 ```
-
 ---
-
-## Exercise Overview
-
 ### **ex1_blinky — Alternating LEDs**
 **Goal:** Flash two external LEDs alternately every 1 second.
 
@@ -46,7 +28,6 @@ exX_name/
 * `gpio_pin_set_dt()` and `k_sleep()`
 
 **Milestone:** 1
-
 ---
 
 ### **ex2_waves — Dual Square‑Wave Generator**
@@ -58,7 +39,6 @@ exX_name/
 * Software frequency division using counters
 
 **Milestone:** 2
-
 ---
 
 ### **ex3_switch_waves — Frequency Selection via Switch**
@@ -69,8 +49,7 @@ exX_name/
 * Switch selects between two output frequencies
 * Demonstrates clean digital input handling
 
-**Milestone:** 3
-
+**Milestone:** 3, 3b
 ---
 
 ### **ex4_segment_disp — Seven‑Segment Display (0–9)**
@@ -80,8 +59,7 @@ exX_name/
 * Binary → Hex → Segment mapping
 * Displays digits **0–9** repeatedly
 
-**Milestone:** 4
-
+**Milestone:** 4, 4==
 ---
 
 ### **ex5_hello — Seven‑Segment HELLO**
@@ -92,7 +70,6 @@ exX_name/
 * Reinforces register‑level GPIO control
 
 **Milestone:** 5
-
 ---
 
 ### **ex6_dac — Digital‑to‑Analogue Output**
@@ -102,29 +79,7 @@ exX_name/
 * Output fixed voltages (0.5–2.5 V)
 * Generate a **100 Hz sawtooth waveform**
 * Observe output using an oscilloscope
-
 **Milestones:** 6A, 6B
-
 ---
 
-## Hardware Used
-
-* **MCU:** STM32 Nucleo‑L432KC
-* LEDs + resistors (50–220 Ω)
-* Toggle switch
-* Seven‑segment display (common cathode)
-* Breadboard & jumper wires
-* Oscilloscope
-
----
-
-## Notes
-
-* Pins are **never hard‑coded** in `main.c`; all hardware mapping is done via overlays.
-* Each exercise is designed to be demonstrated independently.
-* Timing‑critical code avoids scheduler‑based delays where required.
-
----
-
-Happy hacking 🛠️
 
