@@ -1,18 +1,27 @@
 / {
 	aliases {
-		scope-slow = &pin_d9;   //slow being 1000hz
-		scope-fast = &pin_d10;  // fast being 100kHz
+
+		sw-input = &button_d9; /* this is my input because i called it that*/
+
+		wave-out = &pin_d10; /* same sh*t */
 	};
 
-	outputs {
-		compatible = "gpio-leds";
-		pin_d9: scope_out_1 {
-			gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
-			label = "Scope Output 1kHz";
+	gpio_keys {
+		compatible = "gpio-keys";
+
+		button_d9: button_d9 {
+			gpios = <&gpioa 8 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "User Switch";
 		};
-		pin_d10: scope_out_2 {
+	};
+
+	/* def outs */
+	leds {
+		compatible = "gpio-leds";
+		
+		pin_d10: scope_out {
 			gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
-			label = "Scope Output 100kHz";
+			label = "Scope Output";
 		};
 	};
 };

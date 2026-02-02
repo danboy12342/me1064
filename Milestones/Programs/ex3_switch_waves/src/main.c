@@ -1,44 +1,52 @@
 /*
-Program 2: Square Wave Generation (1kHz and 100kHz)
-Description: This program generates two square wave signals on an embedded board using Zephyr RTOS.
+Program 3: square wave whose frequency depends on the
+position of a switch
+Description: 
 Course: 1064
 Author: Daniel Mui
-Date: 19/1/2026
+Date: 2/2/2026
  */
 
-// Inncs
+ /*import tarrifs */
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 
-//define all
-#define SLOW_NODE  DT_ALIAS(scope_slow) // D9
-#define FAST_NODE  DT_ALIAS(scope_fast) // D10
-//define strcuts
-static const struct gpio_dt_spec pin_1k   = GPIO_DT_SPEC_GET(SLOW_NODE, gpios);
-static const struct gpio_dt_spec pin_100k = GPIO_DT_SPEC_GET(FAST_NODE, gpios);
+/* obtain wooden swoard, i mean aliais from overlay */
+#define SW_NODE   DT_ALIAS(sw_input)
+#define WAVE_NODE DT_ALIAS(wave_out)
 
-//main loop
+/* innit */
+static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW_NODE, gpios);
+static const struct gpio_dt_spec scope  = GPIO_DT_SPEC_GET(WAVE_NODE, gpios);
+
 int main(void)
 {
-	int counter = 0;
+	int ret;
+	int button_state;
 
-	gpio_pin_configure_dt(&pin_1k, GPIO_OUTPUT_ACTIVE);
-	gpio_pin_configure_dt(&pin_100k, GPIO_OUTPUT_ACTIVE);
+	/* Digital 10 conf */
+	if (!gpio_is_ready_dt(&scope)) return 0;
+	ret = gpio_pin_configure_dt(&scope, GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) return 0;
+
+	/* 9 confiong */
+	if (!gpio_is_ready_dt(&button)) return 0;
+	ret = gpio_pin_configure_dt(&button, GPIO_INPUT);
+	if (ret < 0) return 0;
 
 	while (1) {
-		
-		// --- 100kHz Signal (Pin D10)
-		gpio_pin_toggle_dt(&pin_100k);
+		/* what the button say */
+		button_state = gpio_pin_get_dt(&button);
+		//gpio_pin_toggle_dt(&scope); /* comment out cause this is for LED */
 
-		// --- 1kHz Signal (Pin D9)
-		counter++;
-		if (counter >= 100) { //counting to a number that gives the Hz needed based on the base time of 5us
-			gpio_pin_toggle_dt(&pin_1k);
-			counter = 0; 
+		/* Toggle out */
+		gpio_pin_toggle_dt(&scope);
+
+		if (button_state == 1) { /*trying for 0.5khz*/
+			k_busy_wait(1000); /*use busy wait for 'accuracy' could use k_sleep(K_MSEC(250)); for led */
+		} else { /*trying for 200Hz*/
+			k_busy_wait(2500);
 		}
-
-		//constant cpu usage means greater precision in timing
-		k_busy_wait(5); 
 	}
-	return 0;
+	return 0; /*we write good code here*/
 }
