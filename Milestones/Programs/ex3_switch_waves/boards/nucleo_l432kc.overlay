@@ -1,0 +1,18 @@
+/ {
+	aliases {
+		scope-slow = &pin_d9;   //slow being 1000hz
+		scope-fast = &pin_d10;  // fast being 100kHz
+	};
+
+	outputs {
+		compatible = "gpio-leds";
+		pin_d9: scope_out_1 {
+			gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
+			label = "Scope Output 1kHz";
+		};
+		pin_d10: scope_out_2 {
+			gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
+			label = "Scope Output 100kHz";
+		};
+	};
+};
