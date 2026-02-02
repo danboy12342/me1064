@@ -8,7 +8,7 @@ The goal of this repo is to demonstrate how to configure GPIOs, use Device Tree 
 
 ## Structure
 
-The project follows the standard Zephyr application structure.
+The project follows the standard Zephyr application structure as given by Dr Giorgos Georgiou in the lectures.
 
 ```text
 /your-project-root
@@ -68,22 +68,5 @@ To achieve **microsecond precision**, we cannot use standard sleep functions.
 ### Wiring for Scope
 *   **Probe 1:** Connect to **D9** (and GND clip to GND).
 *   **Probe 2:** Connect to **D10** (and GND clip to GND).
-
----
-
-## Common Troubleshooting
-
-### 1. "DT_ALIAS not found" or Build Errors
-If you get errors saying `led_red` or specific nodes are undefined:
-*   Make sure your overlay file is in the `boards/` folder.
-*   **Crucial:** The filename must match the board identifier exactly.
-    *   ✅ Correct: `nucleo_l432kc.overlay`
-    *   ❌ Incorrect: `nucleo 1432kc.overlay` (Space and typo)
-*   Perform a **Pristine Build** after renaming.
-
-### 2. Frequency is wrong on the Scope
-If your frequency is way lower than expected (e.g., 500Hz instead of 100kHz):
-*   Check if you are using `k_sleep()` instead of `k_busy_wait()`.
-*   Check your oscilloscope horizontal scale (Time/Div).
 
 ---
