@@ -2,7 +2,7 @@
 
 ![Zephyr RTOS](https://img.shields.io/badge/Zephyr-RTOS-blue) ![Board](https://img.shields.io/badge/Board-Nucleo--L432KC-green) ![Course](https://img.shields.io/badge/Course-ENG1064-orange)
 
-This repository contains **incremental lab exercises** for the *Digital Electronics & Embedded Systems* course. Each example builds on the previous one and targets the **STM32 Nucleo‑L432KC** using **Zephyr RTOS**.
+This repository contains **incremental lab exercises** for the *Microelectronics 1* course. Each example builds on the previous one and targets the **STM32 Nucleo‑L432KC** using **Zephyr RTOS**.
 ---
 ## Repository Structure
 
