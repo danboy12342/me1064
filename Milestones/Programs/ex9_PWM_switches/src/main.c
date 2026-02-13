@@ -1,5 +1,6 @@
 /*
-Program 7: Illuminating LEDs depending on input voltage
+Program 9: Create a PWM signal with period and duty cycle
+controlled by switches
 Description: 
 Course: 1064
 Author: Daniel Mui
