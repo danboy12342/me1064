@@ -9,87 +9,49 @@ Date: 16/2/2026
 
  //import tarrifs
 #include <zephyr/device.h>
+#include <zephyr/drivers/pwm.h>
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/adc.h>
 
-//init GPIOs for LED
-static const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(DT_NODELABEL(led1), gpios);
-static const struct gpio_dt_spec led2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led2), gpios);
-static const struct gpio_dt_spec led3 = GPIO_DT_SPEC_GET(DT_NODELABEL(led3), gpios);
-static const struct gpio_dt_spec led4 = GPIO_DT_SPEC_GET(DT_NODELABEL(led4), gpios);
+//mk pwm device for led0
+static const struct pwm_dt_spec pwm_led0 = PWM_DT_SPEC_GET(DT_NODELABEL(green_pwm_led));
 
-// init ADC device
-static const struct device *const adc_dev = DEVICE_DT_GET(DT_NODELABEL(adc1));
+//consts for switches
+static const struct gpio_dt_spec switch1 = GPIO_DT_SPEC_GET(DT_NODELABEL(switch1), gpios);
+static const struct gpio_dt_spec switch2 = GPIO_DT_SPEC_GET(DT_NODELABEL(switch2), gpios);
 
-//initADC conf
-static const struct adc_channel_cfg adc_ch_cfg = ADC_CHANNEL_CFG_DT(
-    DT_CHILD(DT_NODELABEL(adc1), channel_5)
-);
-
-int main() {
-    // wakeup outs
-    gpio_pin_configure_dt(&led1, GPIO_OUTPUT_LOW);
-    gpio_pin_configure_dt(&led2, GPIO_OUTPUT_LOW);
-    gpio_pin_configure_dt(&led3, GPIO_OUTPUT_LOW);
-    gpio_pin_configure_dt(&led4, GPIO_OUTPUT_LOW);
+int main(void)
+{
+    // Confs to mk ins
+    gpio_pin_configure_dt(&switch1, GPIO_INPUT);
+    gpio_pin_configure_dt(&switch2, GPIO_INPUT);
+    //inits
+    int period;
+    int pulse_width;
+    int switch1_state;
+    int switch2_state;
     
-    // wakeup ADC
-    adc_channel_setup(adc_dev, &adc_ch_cfg);
-    
-    //code from lab manual
-    uint16_t buf;
-    struct adc_sequence sequence = {
-        .channels = BIT(5),        // ch.5
-        .buffer = &buf,
-        .buffer_size = sizeof(buf),
-        .resolution = 12
-    };
-    
-    
-    while(1) {
-        //read
-        adc_read(adc_dev, &sequence);
+    while (1) {
+        // Read
+        switch1_state = gpio_pin_get_dt(&switch1);
+        switch2_state = gpio_pin_get_dt(&switch2);
         
-        //milli conversion
-        int voltage_mv = buf * 3300 / 4095;
-        
-        if (voltage_mv < 600) { //if for controling the LEDs based on voltage levels
-            // 0V < Vin < 0.6V: All LEDs OFF
-            gpio_pin_set_dt(&led1, 0);
-            gpio_pin_set_dt(&led2, 0);
-            gpio_pin_set_dt(&led3, 0);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else if (voltage_mv < 1200) {
-            // 0.6V < Vin < 1.2V: LED1 ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 0);
-            gpio_pin_set_dt(&led3, 0);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else if (voltage_mv < 1800) {
-            // 1.2V < Vin < 1.8V: LED1, LED2 ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 1);
-            gpio_pin_set_dt(&led3, 0);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else if (voltage_mv < 2400) {
-            // 1.8V < Vin < 2.4V: LED1, LED2, LED3 ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 1);
-            gpio_pin_set_dt(&led3, 1);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else {
-            // Vin > 2.4V: All LEDs ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 1);
-            gpio_pin_set_dt(&led3, 1);
-            gpio_pin_set_dt(&led4, 1);
+        // Switch 1 controls period: 1kHz or 1MHz
+        if (switch1_state == 0) {
+            period = 1000000;
+        } else {ds
+            period = 1000;
         }
         
-        k_sleep(K_MSEC(200));
+        // Switch 2 controls duty cycle: 20% or 80%
+        if (switch2_state == 0) {
+            // 20% duty cycle
+            pulse_width = period * 20 / 100;
+        } else {
+            // 80% duty cycle
+            pulse_width = period * 80 / 100;
+        }
+
+        pwm_set_dt(&pwm_led0, period, pulse_width);
+        k_sleep(K_MSEC(500)); //poll rate (but only for swtches, pwm runs indy)
     }
-    //we dont write safe code i guess
 }

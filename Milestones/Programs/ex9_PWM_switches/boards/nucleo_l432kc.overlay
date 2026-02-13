@@ -1,35 +1,31 @@
-/ {
-    /* GPIO Outputs for 4 LEDs */
-    gpio_outputs {
-        compatible = "gpio-leds";
-        led1: led1 {
-            gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>; // PB4 -> D12
+/{
+    pwmleds: pwmleds {
+        compatible = "pwm-leds";
+        status = "okay";
+        green_pwm_led: green_pwm_led {
+            pwms = <&pwm2 4 PWM_MSEC(20) PWM_POLARITY_NORMAL>; // &pwm2 links to TIM2_CH4 and PA3
         };
-        led2: led2 {
-            gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>; // PB5 -> D11
+    };
+    
+    /* GPIO Inputs for switches */
+    gpio_inputs {
+        compatible = "gpio-keys";
+        switch1: switch1 {
+            gpios = <&gpioa 8 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>; // PA8 -> D9
         };
-        led3: led3 {
-            gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>; // PA8 -> D9
-        };
-        led4: led4 {
-            gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>; // PA11 -> D10
+        switch2: switch2 {
+            gpios = <&gpioa 11 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>; // PA11 -> D10
         };
     };
 };
 
-/* Enable and configure the ADC */
-&adc1 {
+&pwm2 {
     status = "okay";
-    st,adc-clock-source = "SYNC";
-    st,adc-prescaler = <1>;
-    #address-cells = <1>;
-    #size-cells = <0>;
-    
-    channel_5: channel@5 {  // Channel 5 linked to pin PA0
-        reg = <5>;
-        zephyr,gain = "ADC_GAIN_1";
-        zephyr,reference = "ADC_REF_INTERNAL";
-        zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
-        zephyr,resolution = <12>;
+    pinctrl-0 = <&pwm2_custom>;
+};
+
+&pinctrl {
+    pwm2_custom: pwm2_custom {
+        pinmux = <STM32_PINMUX('A', 3, AF1)>; // Alternative function AF1 for this pin
     };
 };
