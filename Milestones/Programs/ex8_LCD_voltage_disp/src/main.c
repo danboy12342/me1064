@@ -1,5 +1,5 @@
 /*
-Program 7: Illuminating LEDs depending on input voltage
+Program 8: Display a voltage to an LCD display
 Description: 
 Course: 1064
 Author: Daniel Mui
@@ -9,33 +9,28 @@ Date: 16/2/2026
  //import tarrifs
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/auxdisplay.h>
 #include <zephyr/drivers/adc.h>
+#include <stdio.h>
+#include <string.h> 
 
-//init GPIOs for LED
-static const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(DT_NODELABEL(led1), gpios);
-static const struct gpio_dt_spec led2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led2), gpios);
-static const struct gpio_dt_spec led3 = GPIO_DT_SPEC_GET(DT_NODELABEL(led3), gpios);
-static const struct gpio_dt_spec led4 = GPIO_DT_SPEC_GET(DT_NODELABEL(led4), gpios);
+//make lcd device
+static const struct device *const lcd_display = DEVICE_DT_GET(DT_NODELABEL(lcd_screen));
 
-// init ADC device
-static const struct device *const adc_dev = DEVICE_DT_GET(DT_NODELABEL(adc1));
+//,aeke adc device
+static const struct device *const adc_dev1 = DEVICE_DT_GET(DT_NODELABEL(adc1));
 
-//initADC conf
-static const struct adc_channel_cfg adc_ch_cfg = ADC_CHANNEL_CFG_DT(
+// Create variable adc_ch1_cfg with the conf <-- Overlay
+static const struct adc_channel_cfg adc_ch1_cfg = ADC_CHANNEL_CFG_DT(
     DT_CHILD(DT_NODELABEL(adc1), channel_5)
 );
 
-int main() {
-    // wakeup outs
-    gpio_pin_configure_dt(&led1, GPIO_OUTPUT_LOW);
-    gpio_pin_configure_dt(&led2, GPIO_OUTPUT_LOW);
-    gpio_pin_configure_dt(&led3, GPIO_OUTPUT_LOW);
-    gpio_pin_configure_dt(&led4, GPIO_OUTPUT_LOW);
+int main() { //big boy loops now
+    // Initialise
+    adc_channel_setup(adc_dev1, &adc_ch1_cfg);
+    auxdisplay_clear(lcd_display);
     
-    // wakeup ADC
-    adc_channel_setup(adc_dev, &adc_ch_cfg);
-    
-    //code from lab manual
+    //seq for mesurement
     uint16_t buf;
     struct adc_sequence sequence = {
         .channels = BIT(5),        // ch.5
@@ -44,51 +39,18 @@ int main() {
         .resolution = 12
     };
     
+    char msg1[64]; // Create a char var
     
-    while(1) {
-        //read
-        adc_read(adc_dev, &sequence);
-        
-        //milli conversion
-        int voltage_mv = buf * 3300 / 4095;
-        
-        if (voltage_mv < 600) { //if for controling the LEDs based on voltage levels
-            // 0V < Vin < 0.6V: All LEDs OFF
-            gpio_pin_set_dt(&led1, 0);
-            gpio_pin_set_dt(&led2, 0);
-            gpio_pin_set_dt(&led3, 0);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else if (voltage_mv < 1200) {
-            // 0.6V < Vin < 1.2V: LED1 ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 0);
-            gpio_pin_set_dt(&led3, 0);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else if (voltage_mv < 1800) {
-            // 1.2V < Vin < 1.8V: LED1, LED2 ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 1);
-            gpio_pin_set_dt(&led3, 0);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else if (voltage_mv < 2400) {
-            // 1.8V < Vin < 2.4V: LED1, LED2, LED3 ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 1);
-            gpio_pin_set_dt(&led3, 1);
-            gpio_pin_set_dt(&led4, 0);
-        }
-        else {
-            // Vin > 2.4V: All LEDs ON
-            gpio_pin_set_dt(&led1, 1);
-            gpio_pin_set_dt(&led2, 1);
-            gpio_pin_set_dt(&led3, 1);
-            gpio_pin_set_dt(&led4, 1);
-        }
-        
+    while(1){ 
+        auxdisplay_clear(lcd_display); //clear it
+
+        adc_read(adc_dev1, &sequence); // Read
+
+        int voltage = buf * 3300/4095; // Convert and write
+        snprintf(msg1, sizeof(msg1), "Voltage is: %d mV", voltage);
+        auxdisplay_write(lcd_display, msg1, strlen(msg1) );
+
         k_sleep(K_MSEC(200));
     }
-    //we dont write safe code i guess
+    //safe code is a lie told by big code to sell more code
 }

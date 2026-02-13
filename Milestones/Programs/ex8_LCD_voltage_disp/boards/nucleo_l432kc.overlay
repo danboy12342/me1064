@@ -1,20 +1,21 @@
 / {
-    /* GPIO Outputs for 4 LEDs */
-    gpio_outputs {
-        compatible = "gpio-leds";
-        led1: led1 {
-            gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>; // PB4 -> D12
-        };
-        led2: led2 {
-            gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>; // PB5 -> D11
-        };
-        led3: led3 {
-            gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>; // PA8 -> D9
-        };
-        led4: led4 {
-            gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>; // PA11 -> D10
-        };
-    };
+ lcd_screen: hd44780 {
+ compatible = "hit,hd44780";
+ mode = <4>; // Operating in 4-bit mode.
+ register-select-gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>; // LCD Register Select (RS)
+GPIO PA6 to pin4
+ enable-gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>; // Enable to send commands GPIO PA7 to pin6
+ data-bus-gpios = <0>, / An array of 8 GPIO pins. If this
+ <0>, // operates on 4-bit mode we only
+ <0>, // need to link the last 4 to GPIOs pins
+ <0>,
+<&gpioa 8 GPIO_ACTIVE_HIGH>, // GPIO PA8 to LCD pin11
+ <&gpioa 11 GPIO_ACTIVE_HIGH>, // GPIO PA11 to LCD pin12
+ <&gpiob 5 GPIO_ACTIVE_HIGH>, // GPIO PB5 to LCD pin13
+ <&gpiob 4 GPIO_ACTIVE_HIGH>; // GPIO PB4 to LCD pin14
+ columns = <16>; // LCD number of columns
+ rows = <2>; // LCD number of rows
+ };
 };
 
 /* Enable and configure the ADC */
