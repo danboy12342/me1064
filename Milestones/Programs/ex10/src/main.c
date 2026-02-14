@@ -1,9 +1,0 @@
-/*
-Program 10: 
-Description: 
-Course: 1064
-Author: Daniel Mui
-Date: 16/2/2026
- */
-
- //import tarrifs
