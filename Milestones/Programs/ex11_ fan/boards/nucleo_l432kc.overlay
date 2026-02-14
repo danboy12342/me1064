@@ -1,0 +1,64 @@
+/{
+    /* LCD Display Device */
+    lcd_screen: hd44780 {
+        compatible = "hit,hd44780";
+        mode = <4>;
+        register-select-gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>;
+        enable-gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
+        data-bus-gpios = <0>,
+                         <0>,
+                         <0>,
+                         <0>,
+                         <&gpioa 8 GPIO_ACTIVE_HIGH>,
+                         <&gpioa 11 GPIO_ACTIVE_HIGH>,
+                         <&gpiob 5 GPIO_ACTIVE_HIGH>,
+                         <&gpiob 4 GPIO_ACTIVE_HIGH>;
+        columns = <16>;
+        rows = <2>;
+    };
+    
+    /* PWM for motor control */
+    pwmleds: pwmleds {
+        compatible = "pwm-leds";
+        status = "okay";
+        green_pwm_led: green_pwm_led {
+            pwms = <&pwm2 4 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+    
+    /* GPIO Input for override switch */
+    gpio_inputs {
+        compatible = "gpio-keys";
+        override_switch: override_switch {
+            gpios = <&gpiob 3 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>; // PB3 -> A4
+        };
+    };
+};
+
+&pwm2 {
+    status = "okay";
+    pinctrl-0 = <&pwm2_custom>;
+};
+
+&pinctrl {
+    pwm2_custom: pwm2_custom {
+        pinmux = <STM32_PINMUX('A', 3, AF1)>;
+    };
+};
+
+/* Enable and configure the ADC */
+&adc1 {
+    status = "okay";
+    st,adc-clock-source = "SYNC";
+    st,adc-prescaler = <1>;
+    #address-cells = <1>;
+    #size-cells = <0>;
+    
+    channel_5: channel@5 {  // Channel 5 linked to pin PA0
+        reg = <5>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+        zephyr,resolution = <12>;
+    };
+};
