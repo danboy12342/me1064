@@ -1,35 +1,51 @@
 / {
-    /* GPIO Outputs for 4 LEDs */
+    /* DigitalOut and DigitalIn for the sensor */
     gpio_outputs {
         compatible = "gpio-leds";
-        led1: led1 {
-            gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>; // PB4 -> D12
+        trig_pin: trig_pin {
+            gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>; /* PA1 (A1) */
         };
-        led2: led2 {
-            gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>; // PB5 -> D11
+    };
+
+    gpio_inputs {
+        compatible = "gpio-keys";
+        echo_pin: echo_pin {
+            gpios = <&gpioa 2 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>; /* PA2 (A2) */
         };
-        led3: led3 {
-            gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>; // PA8 -> D9
+    };
+
+    /* PWM*/
+    pwmleds: pwmleds {
+        compatible = "pwm-leds";
+        buzzer_pwm: buzzer_pwm {
+            pwms = <&pwm2 4 PWM_MSEC(1) PWM_POLARITY_NORMAL>; /* PA3 (A3) */
         };
-        led4: led4 {
-            gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>; // PA11 -> D10
-        };
+    };
+
+    /* LCD */
+    lcd_screen: hd44780 {
+        compatible = "hit,hd44780";
+        mode = <4>;
+        register-select-gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>;
+        enable-gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;
+        data-bus-gpios = <0>, <0>, <0>, <0>,
+                         <&gpioa 8 GPIO_ACTIVE_HIGH>,
+                         <&gpioa 11 GPIO_ACTIVE_HIGH>,
+                         <&gpiob 5 GPIO_ACTIVE_HIGH>,
+                         <&gpiob 4 GPIO_ACTIVE_HIGH>;
+        columns = <16>;
+        rows = <2>;
     };
 };
 
-/* Enable and configure the ADC */
-&adc1 {
+/*PWM2 @ PA3 */
+&pwm2 {
     status = "okay";
-    st,adc-clock-source = "SYNC";
-    st,adc-prescaler = <1>;
-    #address-cells = <1>;
-    #size-cells = <0>;
-    
-    channel_5: channel@5 {  // Channel 5 linked to pin PA0
-        reg = <5>;
-        zephyr,gain = "ADC_GAIN_1";
-        zephyr,reference = "ADC_REF_INTERNAL";
-        zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
-        zephyr,resolution = <12>;
+    pinctrl-0 = <&pwm2_custom>;
+};
+
+&pinctrl {
+    pwm2_custom: pwm2_custom {
+        pinmux = <STM32_PINMUX('A', 3, AF1)>; 
     };
 };
